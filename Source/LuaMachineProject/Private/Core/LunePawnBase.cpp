@@ -4,7 +4,7 @@
 
 
 // Sets default values
-ALunePawnBase::ALunePawnBase() : bIntializationCompleted(0)
+ALunePawnBase::ALunePawnBase(const FObjectInitializer& ObjectInitializer) : bIntializationCompleted(0)
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;

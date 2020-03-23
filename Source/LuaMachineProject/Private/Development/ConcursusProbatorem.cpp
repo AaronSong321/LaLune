@@ -40,7 +40,7 @@ void AConcursusProbatorem::TestCollide2() {
 	enemy1 = GetWorld()->SpawnActor<AEnemy>(WraithClass, FVector(100, 0, 100), FRotator::ZeroRotator);
 	enemy2 = GetWorld()->SpawnActor<AEnemy>(WraithClass, FVector(20, 0, 20), FRotator::ZeroRotator);
 	UE_LOG(LuneProject, Log, TEXT("%s"), *enemy1->GetActorLocation().ToString());
-	turret1->AddRangeMul(1.f);
+	turret1->AddRangeMul(3.f);
 }
 
 void AConcursusProbatorem::EndPlay(const EEndPlayReason::Type EndPlayReason)

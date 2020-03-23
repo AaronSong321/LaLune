@@ -3,5 +3,7 @@
 #include "LuneObjectBase.h"
 
 
+ULuneObjectBase::ULuneObjectBase() :bCanEverTick(0), bInitializationCompleted(0) {
 
+}
 

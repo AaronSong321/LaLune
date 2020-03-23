@@ -2,9 +2,11 @@
 
 #include "Turret.h"
 #include "GameCore/Enemy.h"
+#include "Core/Bullet.h"
+#include "Core/TurretBuff.h"
 
 
-ATurret::ATurret() : ALuneActorBase(), DamageOffset(0), DamageAddon(0), DamageMul(1.f), RangeMul(1.f), Damage(20), Range(50)
+ATurret::ATurret(const FObjectInitializer& ObjectInitializer) : ALunePawnBase(ObjectInitializer), DamageOffset(0), DamageAddon(0), DamageMul(1.f), RangeMul(1.f), Damage(20), Range(50), BulletPrototype(ABullet::StaticClass())
 {
 	UAttackBehavior* attacker1 = CreateDefaultSubobject<UAttackBehavior>(TEXT("Attacker1"), false);
 	attacker1->SetAttackBehaviorName(TEXT("Attacker1"));
@@ -30,7 +32,6 @@ void ATurret::BeginPlay()
 void ATurret::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
-	UE_LOG(LuneProject, Log, TEXT("ATurret object EndPlay()"));
 	AttackRange->OnComponentBeginOverlap.RemoveDynamic(this, &ATurret::OnAttackRangeOverlap);
 }
 
@@ -45,5 +46,16 @@ void ATurret::OnAttackRangeOverlap(UPrimitiveComponent* OverlappedComp, AActor* 
 {
 	AEnemy* enemy = Cast<AEnemy>(OtherActor);
 	UE_LOG(LuneProject, Log, TEXT("in %s: %d %d %d %d"), int32(OverlappedComp == AttackRange), enemy != nullptr, OtherBodyIndex, int32(bFromSweep));
+}
+
+ABullet* ATurret::GenerateBullet(Enemy* Target) {
+	ABullet* Bullet = NewObject<ABullet>(this, ABullet::StaticClass());
+	Bullet->Instigator = this;
+
+
+	for (auto TB : ActiveBuffs) {
+		TB->RetrofitBullet(Bullet);
+	}
+	return Bullet;
 }
 

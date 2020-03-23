@@ -13,7 +13,7 @@ class LUAMACHINEPROJECT_API ALunePawnBase : public APawn
 
 public:
 	// Sets default values for this pawn's properties
-	ALunePawnBase();
+	ALunePawnBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
 	// Called when the game starts or when spawned
@@ -40,6 +40,5 @@ protected:
 		uint8 IsInitializationCompleted() { return bIntializationCompleted; }
 	UFUNCTION(BlueprintCallable)
 		void LockObject() { bIntializationCompleted = 1; }
-	
 	
 };

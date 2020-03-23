@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "LuneActorBase.h"
+#include "LunePawnBase.h"
 #include "CommonActors.h"
 #include "AttackBehavior.h"
 #include "Components/SphereComponent.h"
@@ -13,12 +13,13 @@
  * 
  */
 UCLASS()
-class LUAMACHINEPROJECT_API ATurret : public ALuneActorBase
+class LUAMACHINEPROJECT_API ATurret : public ALunePawnBase
 {
 	GENERATED_BODY()
 
 public:
-	ATurret();
+	ATurret(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
 protected:
 	UFUNCTION() virtual void BeginPlay() override;
 public:
@@ -116,4 +117,17 @@ public:
 protected:
 	UPROPERTY() TArray<UAttackBehavior*> Attackers;
 	void ReadAttackers();
+
+	UPROPERTY() TArray<class UTurretBuff*> ActiveBuffs;
+public:
+	void AddBuff(UTurretBuff* buff) {
+		ActiveBuffs.Add(buff);
+	}
+	void RemoveBuff(UTurretBuff* buff) {
+		ActiveBuffs.Remove(buff);
+	}
+
+public:
+	virtual class ABullet* GenerateBullet(class Enemy* Target);
+	TSubclassOf<class ABullet> BulletPrototype;
 };

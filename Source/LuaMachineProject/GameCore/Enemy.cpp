@@ -1,6 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Enemy.h"
+#include "Core/Bullet.h"
+#include "Core/Turret.h"
 
 
 AEnemy::AEnemy() :ALunePawnBase() {
@@ -14,3 +16,18 @@ AEnemy::AEnemy() :ALunePawnBase() {
 	
 }
 
+void AEnemy::EndPlay(const EEndPlayReason::Type Reason) {
+	Super::EndPlay(Reason);
+}
+
+void AEnemy::HitBy(ABullet* Bullet) {
+	if (Bullet->bHasDamage) {
+		TakeDamage(Bullet->Damage, Bullet->Instigator, Bullet);
+	}
+}
+
+void AEnemy::TakeDamage(float Amount, APawn* Instigator, AActor* Causer) {
+	ATurret* Turret = Cast<ATurret>(Instigator);
+	ABullet* Bullet = Cast<ABullet>(Causer);
+
+}
