@@ -118,25 +118,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Attack Range") void AddRangeMul(float _mul) {
 		RangeMul += _mul; RecalculateRange(); SetupRange();
 	}
-
-private:
-	TArray<AEnemy*> WatchList;
-protected:
-	// Determine what to do when an enemy is in range. The default behavior is to add the enemy to the WatchList.
-	// Should not be called externally.
-	UFUNCTION(Category = "Enemy Detection")
-	virtual void OnAttackRangeBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	UFUNCTION(Category = "Enemy Detection")
-	virtual void OnAttackRangeEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-	// Determine whether this turret can attack this enemy. The default behavior is to see the ground-air value of turret and enemy.
-	UFUNCTION(BlueprintCallable, Category = "Enemy Detection")
-	virtual bool CanAttackEnemy(AEnemy* Enemy) const;
+	UFUNCTION(BlueprintCallable, Category = "Attack Range") void OnAttackRangeOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 public:
 	UPROPERTY() TArray<UAttackBehavior*> Attackers;
 	void ReadAttackers();
-	UPROPERTY() TArray<UTurretBuff*> ActiveBuffs;
 
+	UPROPERTY() TArray<UTurretBuff*> ActiveBuffs;
 public:
 	void AddBuff(UTurretBuff* buff) {
 		ActiveBuffs.Add(buff);

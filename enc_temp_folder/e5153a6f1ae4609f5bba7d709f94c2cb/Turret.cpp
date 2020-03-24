@@ -16,8 +16,7 @@ ATurret::ATurret(const FObjectInitializer& ObjectInitializer) : ALunePawnBase(Ob
 	RootComponent = AttackRange;
 	AttackRange->InitSphereRadius(Range);
 	AttackRange->SetCollisionProfileName(TEXT("BlockAllDynamic"));
-	AttackRange->OnComponentBeginOverlap.AddDynamic(this, &ATurret::OnAttackRangeBeginOverlap);
-	AttackRange->OnComponentEndOverlap.AddDynamic(this, &ATurret::OnAttackRangeEndOverlap);
+	AttackRange->OnComponentBeginOverlap.AddDynamic(this, &ATurret::OnAttackRangeOverlap);
 	AttackRange->SetGenerateOverlapEvents(true);
 	bGenerateOverlapEventsDuringLevelStreaming = 1;
 
@@ -32,8 +31,7 @@ void ATurret::BeginPlay()
 void ATurret::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
-	AttackRange->OnComponentBeginOverlap.RemoveDynamic(this, &ATurret::OnAttackRangeBeginOverlap);
-	AttackRange->OnComponentEndOverlap.RemoveDynamic(this, &ATurret::OnAttackRangeEndOverlap);
+	AttackRange->OnComponentBeginOverlap.RemoveDynamic(this, &ATurret::OnAttackRangeOverlap);
 }
 
 void ATurret::ReadAttackers()
@@ -43,18 +41,10 @@ void ATurret::ReadAttackers()
 	}
 }
 
-void ATurret::OnAttackRangeBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ATurret::OnAttackRangeOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	AEnemy* enemy = Cast<AEnemy>(OtherActor);
-
-}
-
-void ATurret::OnAttackRangeEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {
-	AEnemy* enemy = Cast<AEnemy>(OtherActor);
-}
-
-bool ATurret::CanAttackEnemy(AEnemy* Enemy) const {
-	return true;
+	UE_LOG(LuneProject, Log, TEXT("in %s: %d %d %d %d"), __FUNCTIONW__, int32(OverlappedComp == AttackRange), enemy != nullptr, OtherBodyIndex, int32(bFromSweep));
 }
 
 ABullet* ATurret::GenerateBullet(AEnemy* Target) {

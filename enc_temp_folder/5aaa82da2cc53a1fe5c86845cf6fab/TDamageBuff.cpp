@@ -5,7 +5,7 @@
 #include "Core/BulletBuff.h"
 #include "GameCore/Enemy.h"
 #include "Core/Turret.h"
-#include "GameFramework/Actor.h"
+
 
 
 UTDamageBuff::UTDamageBuff(const FObjectInitializer& ObjectInitializer) {
@@ -25,7 +25,7 @@ void UTDamageBuff::ThisRetrofitBullet(ABullet* Bullet) {
 	BBuff->BuffOwner = Bullet;
 	BBuff->Damage = Damage;
 	BBuff->OnBulletHitEnemy.BindLambda([](UBulletBuff* Buff, AEnemy* Enemy) {
-		Enemy->TakeBulletDamage(Buff->Damage, Buff->BuffOwner->TurretOwner, Buff->BuffOwner);
+		Enemy->TakeBulletDamage(Buff->Damage, Buff->BuffOwner->Owner, Buff->BuffOwner);
 	});
 }
 

@@ -6,6 +6,10 @@
 #include "Core/TurretBuff.h"
 #include "TDamageBuff.generated.h"
 
+class ATurret;
+class ABullet;
+
+
 /**
  * 
  */
@@ -16,9 +20,11 @@ class LUAMACHINEPROJECT_API UTDamageBuff : public UTurretBuff
 
 	UTDamageBuff(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
+	float Damage;
 public:
 	virtual bool CanApplyToTurret(ATurret* Turret) const override { return true; }
-	virtual void RetrofitBullet(class ABullet* Bullet) override {}
-	
-	
+
+private:
+	void ThisRetrofitBullet(ABullet* Bullet);
+
 };

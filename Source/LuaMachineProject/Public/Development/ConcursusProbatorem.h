@@ -4,9 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Core/LuneActorBase.h"
-#include "GameCore/Enemy.h"
-#include "Core/Turret.h"
 #include "ConcursusProbatorem.generated.h"
+
+class AEnemy;
+class ATurret;
 
 
 /**
@@ -32,11 +33,11 @@ public:
 		void TestCollide2();
 
 	UPROPERTY(EditAnywhere, Category = "Development Test")
-		class AEnemy* enemy1;
+		AEnemy* enemy1;
 	UPROPERTY(EditAnywhere, Category = "Development Test")
-		class AEnemy* enemy2;
+		AEnemy* enemy2;
 	UPROPERTY(EditAnywhere, Category = "Development Test")
-		class ATurret* turret1;
+		ATurret* turret1;
 	
 	
 };

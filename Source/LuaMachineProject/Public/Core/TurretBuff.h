@@ -7,6 +7,9 @@
 #include "TurretBuff.generated.h"
 
 class ATurret;
+class ABullet;
+class UBulletBuff;
+
 
 UENUM()
 enum class ETurretBuffDestroyReason :uint8 {
@@ -53,6 +56,8 @@ protected:
 		uint8 bGenerateBulletBuff : 1;
 	UPROPERTY(EditAnywhere, Category = "Buff|Turret Buff")
 		uint8 bAffectOtherTurretBuffs : 1;
+	UPROPERTY(EditAnywhere, Category = "Buff|Turret Buff")
+	TSubclassOf<UBulletBuff> BulletBuffPrototype;
 
 
 public:
@@ -61,16 +66,33 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Buff|Turret Buff")
 	virtual void ApplyToTurret(ATurret* Turret);
 	UFUNCTION(BlueprintCallable, Category = "Buff|Turret Buff")
-	virtual void OnBeginBuff() {}
+		virtual void OnBeginBuff();
 	UFUNCTION(BlueprintCallable, Category = "Buff|Turret Buff")
-	virtual void OnEndBuff() {}
+		virtual void OnEndBuff();
 	UFUNCTION(BlueprintCallable, Category = "Buff|Turret Buff")
-	virtual void RetrofitBullet(class ABullet* Bullet);
-	UFUNCTION(BlueprintCallable, Category = "Buff|Turret Buff")
-	virtual void ApplyToBuff(UTurretBuff* TBuff) {}
-	UFUNCTION(BlueprintCallable, Category = "Buff|Turret Buff")
-	void Expire();
+		void Expire();
 
+	UFUNCTION(BlueprintCallable, Category = "Buff|Turret Buff")
+	virtual void RetrofitBullet(ABullet* Bullet);
+	UFUNCTION(BlueprintCallable, Category = "Buff|Turret Buff")
+	virtual bool CanApplyToBuff(UTurretBuff* TBuff);
+	UFUNCTION(BlueprintCallable, Category = "Buff|Turret Buff")
+	virtual void ApplyToBuff(UTurretBuff* TBuff) {
+		ApplyToBuffMethod.ExecuteIfBound(TBuff);
+	}
+	UFUNCTION(BlueprintCallable, Category = "Buff|Turret Buff")
+	virtual void RemoveFromBuff(UTurretBuff* TBuff) {
+		RemoveFromBuffMethod.ExecuteIfBound(TBuff);
+	}
+
+	DECLARE_DELEGATE_OneParam(FRetrofitBulletSignature, ABullet*);
+	FRetrofitBulletSignature RetrofitBulletMethod;
+	DECLARE_DELEGATE_RetVal_OneParam(bool, FCanApplyToBuffSignature, UTurretBuff*);
+	FCanApplyToBuffSignature CanApplyToBuffPredicate;
+	DECLARE_DELEGATE_OneParam(FApplyToBuffSignature, UTurretBuff*);
+	FApplyToBuffSignature ApplyToBuffMethod;
+	DECLARE_DELEGATE_OneParam(FRemoveFromBuffSignature, UTurretBuff*);
+	FRemoveFromBuffSignature RemoveFromBuffMethod;
 
 public:
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

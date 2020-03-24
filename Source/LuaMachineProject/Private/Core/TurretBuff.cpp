@@ -2,9 +2,11 @@
 
 #include "Core/TurretBuff.h"
 #include "Core/Turret.h"
+#include "Core/BulletBuff.h"
+
 
 UTurretBuff::UTurretBuff(const FObjectInitializer& ObjectInitializer) {
-
+	BulletBuffPrototype = UBulletBuff::StaticClass();
 }
 
 void UTurretBuff::ApplyToTurret(ATurret* Turret)
@@ -12,6 +14,30 @@ void UTurretBuff::ApplyToTurret(ATurret* Turret)
 	BuffOwner = Turret;
 	Turret->AddBuff(this);
 	OnBeginBuff();
+}
+
+void UTurretBuff::OnBeginBuff() {
+	for (UTurretBuff* buff : BuffOwner->ActiveBuffs) {
+		if (CanApplyToBuff(buff)) {
+			ApplyToBuff(buff);
+		}
+	}
+}
+
+void UTurretBuff::OnEndBuff() {
+	for (UTurretBuff* buff : BuffOwner->ActiveBuffs) {
+		if (CanApplyToBuff(buff)) {
+			RemoveFromBuff(buff);
+		}
+	}
+}
+
+bool UTurretBuff::CanApplyToBuff(UTurretBuff* TBuff) {
+	if (CanApplyToBuffPredicate.IsBound()) {
+		return CanApplyToBuffPredicate.Execute(TBuff);
+	}
+	else
+		return false;
 }
 
 void UTurretBuff::RetrofitBullet(class ABullet* Bullet) {
@@ -40,7 +66,14 @@ void UTurretBuff::Expire() {
 }
 
 void UTurretBuff::EndPlay(const EEndPlayReason::Type EndPlayReason) {
+	UActorComponent::EndPlay(EndPlayReason);
 	OnEndBuff();
 	BuffOwner->RemoveBuff(this);
+	RetrofitBulletMethod.Unbind();
+	CanApplyToBuffPredicate.Unbind();
+	ApplyToBuffMethod.Unbind();
+	RemoveFromBuffMethod.Unbind();
+	OnTurretBuffDestroy.Clear();
 }
+
 

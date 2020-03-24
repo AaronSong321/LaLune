@@ -21,19 +21,11 @@ class LUAMACHINEPROJECT_API ABullet : public ALunePawnBase
 public:
 	ABullet(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-	UPROPERTY(EditAnywhere, Category = "Collision Detection")
-	float HitEnemyDistance = 30.f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	ATurret* TurretOwner;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	ATurret* Owner;
 	AEnemy* Target;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Speed;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	uint8 bHasDamage : 1;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Damage;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<UBulletBuff*> ActiveBuffs;
 
 	// Tick function should not be called explicitly
@@ -41,7 +33,6 @@ public:
 	virtual void MoveToTarget(float DeltaTime);
 	virtual void MoveAfterEnemyDied(float DeltaTime);
 	virtual void OnHitEnemy(AEnemy* Enemy);
-	virtual void OnHitLocation(FVector Location);
 	// Set the target of this bullet to move to and register the enemy's die event
 	virtual void SetTarget(AEnemy* Target);
 	virtual void ProcessTargetDieEvent(ATurret* Turret, AEnemy* Enemy);
