@@ -21,3 +21,7 @@ FString UCommonActors::FormatInitCompleteVialationMessage(FString ClassName, FSt
 {
 	return FString::Printf(InitializationCompleteVialationFormatTemplate, *ClassName, *PropertyName);
 }
+
+bool operator& (const EGroundAirValue left, const EGroundAirValue right) {
+	return ((uint8)left & (uint8)right) != 0;
+}

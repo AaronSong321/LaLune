@@ -28,6 +28,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 public:
+	virtual void Tick(float DeltaTime) override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 
@@ -118,20 +119,87 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Attack Range") void AddRangeMul(float _mul) {
 		RangeMul += _mul; RecalculateRange(); SetupRange();
 	}
-	UFUNCTION(BlueprintCallable, Category = "Attack Range") void OnAttackRangeOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+protected:
+	// Determine what to do when an enemy is in range. The default behavior is to add the enemy to the WatchList.
+	// This function is protected only to be override in blueprint and should not be called externally.
+	UFUNCTION(Category = "Enemy Detection")
+	virtual void OnAttackRangeBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	// This function is protected only to be override in blueprint and should not be called externally.
+	UFUNCTION(Category = "Enemy Detection")
+	virtual void OnAttackRangeEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	// Determine whether this turret can attack this enemy. The default behavior is to see the ground-air value of turret and enemy.
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy Detection")
+		TArray<AEnemy*> WatchList;
+	// This function is protected only to be override in blueprint and should not be called externally.
+	UFUNCTION(Category = "Enemy Detection")
+		virtual void OnWatchedEnemyKilled(AEnemy* Enemy, ATurret* TurretInstigator);
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy Detection")
+		AEnemy* AimingTarget;
+	// Decide which target to attack.
+	// This function is public because there may be taunt ability.
+	UFUNCTION(Category = "Enemy Detection")
+		virtual void RefreshTarget();
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "Enemy Detection")
+	virtual bool CanAttackEnemy(AEnemy* Enemy) const;
+	UPROPERTY(EditAnywhere, Category = "Enemy Detection")
+		EGroundAirValue GroundAirAbility;
 
 public:
 	UPROPERTY() TArray<UAttackBehavior*> Attackers;
 	void ReadAttackers();
+	UPROPERTY(EditAnywhere, Category = "Buff")
+	TArray<UTurretBuff*> ActiveBuffs;
 
-	UPROPERTY() TArray<UTurretBuff*> ActiveBuffs;
 public:
+	UFUNCTION(BlueprintCallable, Category = "Buff")
 	void AddBuff(UTurretBuff* buff) {
 		ActiveBuffs.Add(buff);
 	}
+	UFUNCTION(BlueprintCallable, Category = "Buff")
 	void RemoveBuff(UTurretBuff* buff) {
 		ActiveBuffs.Remove(buff);
 	}
+
+public:
+	// Agility means how fast this turret attacks. The canonical agility is 100, means the turret attacks once per second, and 200 agility means the turret attacks twice per second. 50 agility attacks once per two seconds.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+		float Agility;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+		float AgilityOffset;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+		float AgilityMul;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack", Transient)
+		float AgilityActual;
+	// AttackWeek = 100 / Agility
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack", Transient)
+		float AttackWeek;
+	// The percentage of attack point of an attack week. 0.3 means the turret aims for 0.3*AttackWeek before attacking.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+		float AttackPointPercentage;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack", Transient)
+		float AttackPoint;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack", Transient)
+		float AttackPhase;
+	UFUNCTION(BlueprintCallable, Category = "Attack")
+		void SetAgility(float NewAgility) {
+		Agility = NewAgility;
+		RecalculateAgility();
+	}
+	UFUNCTION(BlueprintCallable, Category = "Attack")
+		void RecalculateAgility() {
+		AgilityActual = (Agility + AgilityOffset)*AgilityMul;
+		AttackWeek = 100 / AgilityActual;
+		AttackPoint = AttackWeek * AttackPointPercentage;
+	}
+protected:
+	UFUNCTION(BlueprintCallable, Category = "Attack")
+		virtual void TickAttack(float DeltaTime);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+		bool AttackFired;
 
 public:
 	virtual ABullet* GenerateBullet(AEnemy* Target);

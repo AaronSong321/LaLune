@@ -80,7 +80,6 @@ void ATurret::OnAttackRangeEndOverlap(UPrimitiveComponent* OverlappedComp, AActo
 void ATurret::OnWatchedEnemyKilled(AEnemy* Enemy, ATurret* TurretInstigator) {
 	WatchList.Remove(Enemy);
 	if (AimingTarget == Enemy) {
-		AimingTarget = nullptr;
 		RefreshTarget();
 	}
 }
@@ -88,11 +87,10 @@ void ATurret::OnWatchedEnemyKilled(AEnemy* Enemy, ATurret* TurretInstigator) {
 void ATurret::RefreshTarget() {
 	if (WatchList.Num()) {
 		AimingTarget = WatchList[0];
+		AttackPhase = 0.f;
+		AttackFired = false;
 	}
-	else
-		AimingTarget = nullptr;
-	AttackPhase = 0.f;
-	AttackFired = false;
+	
 }
 
 bool ATurret::CanAttackEnemy(AEnemy* Enemy) const {
@@ -103,10 +101,9 @@ ABullet* ATurret::GenerateBullet(AEnemy* Target) {
 	FActorSpawnParameters Params;
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	Params.Instigator = this;
-	auto Bullet = GetWorld()->SpawnActor<ABullet>(BulletPrototype, GetActorLocation(), GetActorRotation(), Params);
+	auto Bullet = GetWorld()->SpawnActor<ABullet>(ABullet::StaticClass(), GetActorLocation(), GetActorRotation(), Params);
 	Bullet->SetTurretOwner(this);
 	Bullet->SetTarget(Target);
-	Bullet->Speed = BulletSpeed;
 
 	for (auto TB : ActiveBuffs) {
 		TB->RetrofitBullet(Bullet);
@@ -115,12 +112,6 @@ ABullet* ATurret::GenerateBullet(AEnemy* Target) {
 }
 
 void ATurret::TickAttack(float DeltaTime) {
-	if (AimingTarget == nullptr || AimingTarget->IsPendingKill()) {
-		RefreshTarget();
-	}
-	if (!AimingTarget) {
-		return;
-	}
 	AttackPhase += DeltaTime;
 	if (AttackPhase >= AttackPoint && !AttackFired) {
 		GenerateBullet(AimingTarget);

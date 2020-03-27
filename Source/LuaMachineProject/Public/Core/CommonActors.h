@@ -27,3 +27,12 @@ public:
 
 DECLARE_LOG_CATEGORY_EXTERN(LuneProject, Verbose, All)
 
+UENUM()
+enum class EGroundAirValue : uint8 {
+	None = 0,
+	Ground = 1,
+	Air = 2,
+	GroundAir = 3
+};
+
+bool operator& (const EGroundAirValue left, const EGroundAirValue right);

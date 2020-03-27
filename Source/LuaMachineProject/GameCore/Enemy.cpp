@@ -19,6 +19,7 @@ AEnemy::AEnemy() :ALunePawnBase() {
 
 void AEnemy::BeginPlay() {
 	Super::BeginPlay();
+	HealthPoint = MaxHealth;
 }
 
 void AEnemy::Tick(float DeltaTime) {
@@ -37,6 +38,8 @@ void AEnemy::Tick(float DeltaTime) {
 
 void AEnemy::EndPlay(const EEndPlayReason::Type Reason) {
 	Super::EndPlay(Reason);
+	ProcessGetDamage.Unbind();
+	OnEnemyDamaged.Clear();
 	OnEnemyKilled.Clear();
 }
 
@@ -46,8 +49,19 @@ void AEnemy::HitBy(ABullet* Bullet) {
 	//}
 }
 
-void AEnemy::TakeBulletDamage(float Amount, AActor* Instigator, AActor* Causer) {
-	ATurret* Turret = Cast<ATurret>(Instigator);
-	ABullet* Bullet = Cast<ABullet>(Causer);
+void AEnemy::TakeBulletDamage(float Amount, ATurret* TurretInstigator, ABullet* Causer) {
+	float ActualDamage = Amount > HealthPoint ? HealthPoint : Amount;
+	TakeDamageTemporary(Amount, TurretInstigator);
+}
 
+void AEnemy::TakeDamageTemporary(float Amount, ATurret* TurretInstigator) {
+	HealthPoint -= Amount;
+	UE_LOG(LuneProject, Log, TEXT("Enemy took damage: %f, from: Turret"), Amount);
+	ProcessGetDamage.ExecuteIfBound(this, Amount, TurretInstigator);
+	OnEnemyDamaged.Broadcast(this, Amount, TurretInstigator);
+	if (HealthPoint == 0.f) {
+		UE_LOG(LuneProject, Log, TEXT("Enemy die"));
+		OnEnemyKilled.Broadcast(this, TurretInstigator);
+		Destroy();
+	}
 }

@@ -34,6 +34,7 @@ void UBulletBuff::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 
 
 void UBulletBuff::EndPlay(const EEndPlayReason::Type Reason) {
+	Super::EndPlay(Reason);
 	OnBulletHitEnemy.Unbind();
 }
 

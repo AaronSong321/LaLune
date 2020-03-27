@@ -20,13 +20,13 @@ UTDamageBuff::UTDamageBuff(const FObjectInitializer& ObjectInitializer) {
 
 void UTDamageBuff::ThisRetrofitBullet(ABullet* Bullet) {
 	UBulletBuff* BBuff = NewObject<UBulletBuff>(BulletBuffPrototype);
-	BBuff->RegisterComponent();
-	BBuff->bUseDamage = bHasDamage;
-	BBuff->BuffOwner = Bullet;
-	BBuff->Damage = Damage;
+	BBuff->SetUseDamage(bHasDamage);
+	BBuff->SetBuffOwner(Bullet);
+	BBuff->SetDamage(Damage);
 	BBuff->OnBulletHitEnemy.BindLambda([](UBulletBuff* Buff, AEnemy* Enemy) {
-		Enemy->TakeBulletDamage(Buff->Damage, Buff->BuffOwner->TurretOwner, Buff->BuffOwner);
+		Enemy->TakeBulletDamage(Buff->GetDamage(), Buff->GetBuffOwner()->GetTurretOwner(), Buff->GetBuffOwner());
 	});
+	Bullet->AddBuff(BBuff);
 }
 
 

@@ -45,6 +45,7 @@ bool UTurretBuff::CanApplyToBuff(UTurretBuff* TBuff) {
 }
 
 void UTurretBuff::RetrofitBullet(class ABullet* Bullet) {
+	UE_LOG(LuneProject, Log, TEXT("%s %d"), __FUNCTIONW__, __LINE__);
 	if (bUseCount) {
 		CountsLeft -= 1;
 		if (CountsLeft == 0) {

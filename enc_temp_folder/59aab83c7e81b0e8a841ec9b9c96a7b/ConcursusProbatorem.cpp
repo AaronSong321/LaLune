@@ -42,9 +42,10 @@ void AConcursusProbatorem::TestCollide2() {
 	turret1 = GetWorld()->SpawnActor<ATurret>(AGunner::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator, Params);
 	TSubclassOf<AEnemy> WraithClass = LoadClass<AEnemy>(this, TEXT("Blueprint'/Game/CoreObjects/Wraith.Wraith_C'"));
 	enemy1 = GetWorld()->SpawnActor<AEnemy>(WraithClass, FVector(100, 100, 0), FRotator::ZeroRotator, Params);
-	enemy2 = GetWorld()->SpawnActor<AEnemy>(WraithClass, FVector(300, -560, 0), FRotator::ZeroRotator, Params);
+	enemy2 = GetWorld()->SpawnActor<AEnemy>(WraithClass, FVector(100, 100, 0), FRotator::ZeroRotator, Params);
+	UE_LOG(LuneProject, Log, TEXT("%s"), *enemy2->GetActorLocation().ToString());
 	enemy1->StartRoaming(FVector(1, 1, 0));
-	enemy1->RoamSpeed = 300;
+	enemy2->SetActorLocation(FVector(1, 1, 0));
 	turret1->AddRangeMul(3.f);
 
 	FTimerHandle PrintEnemiesLocation;

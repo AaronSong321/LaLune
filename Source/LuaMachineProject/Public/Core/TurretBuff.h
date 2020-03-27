@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Core/CommonActors.h"
 #include "TurretBuff.generated.h"
 
 class ATurret;
@@ -30,11 +31,11 @@ class LUAMACHINEPROJECT_API UTurretBuff : public UActorComponent
 	
 public:
 	UTurretBuff(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 
-protected:
-	ATurret* BuffOwner;
-
+public:
 	// If true, this buff expires after a certain amount of fires
 	UPROPERTY(EditAnywhere, Category = "Buff|Turret Buff")
 		uint8 bUseCount : 1;
@@ -61,6 +62,8 @@ protected:
 
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Owner")
+	ATurret* BuffOwner;
 	UFUNCTION(BlueprintCallable, Category = "Buff|Turret Buff")
 	virtual bool CanApplyToTurret(ATurret* Turret) const { return false; }
 	UFUNCTION(BlueprintCallable, Category = "Buff|Turret Buff")
@@ -71,7 +74,6 @@ public:
 		virtual void OnEndBuff();
 	UFUNCTION(BlueprintCallable, Category = "Buff|Turret Buff")
 		void Expire();
-
 	UFUNCTION(BlueprintCallable, Category = "Buff|Turret Buff")
 	virtual void RetrofitBullet(ABullet* Bullet);
 	UFUNCTION(BlueprintCallable, Category = "Buff|Turret Buff")
@@ -95,12 +97,10 @@ public:
 	FRemoveFromBuffSignature RemoveFromBuffMethod;
 
 public:
-	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTurretBuffDestroySignature, const ETurretBuffDestroyReason, Reason);
 	UPROPERTY(BlueprintAssignable, Category = "Buff|Turret Buff")
 	FTurretBuffDestroySignature OnTurretBuffDestroy;
 	//DECLARE_EVENT_OneParam(UTurretBuff, FTurretBuffDestroyEvent, const ETurretBuffDestroyReason);
 	//FTurretBuffDestroyEvent OnDestroy;
 
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 };

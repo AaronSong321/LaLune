@@ -23,7 +23,7 @@ public:
 	// Tick function should not be called explicitly
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
-	virtual void EndPlay(const EEndPlayReason::Type Reason) override;
+
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Bullet Target")
@@ -34,9 +34,6 @@ protected:
 	TArray<UBulletBuff*> ActiveBuffs;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Bullet Target")
 	FVector EnemyDieLocation;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Bullet Target")
-	bool bPrimiereTargetAlive;
-
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Collision Detection")
