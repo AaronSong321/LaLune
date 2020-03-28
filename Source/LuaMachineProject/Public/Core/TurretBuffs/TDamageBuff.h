@@ -13,7 +13,7 @@ class ABullet;
 /**
  * 
  */
-UCLASS()
+UCLASS(Category = "Turret Buff|Damage Buff")
 class LUAMACHINEPROJECT_API UTDamageBuff : public UTurretBuff
 {
 	GENERATED_BODY()
@@ -21,7 +21,7 @@ class LUAMACHINEPROJECT_API UTDamageBuff : public UTurretBuff
 public:
 	UTDamageBuff(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Turret Buff|Damage")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Turret Buff|Damage Buff")
 	float Damage;
 public:
 	virtual bool CanApplyToTurret(ATurret* Turret) const override { return true; }
@@ -29,5 +29,29 @@ public:
 private:
 	UFUNCTION(BlueprintCallable, Category = "Turret Buff|Apply")
 	void ThisRetrofitBullet(ABullet* Bullet);
+
+};
+
+UCLASS(Category = "Turret Buff|Decelerate Buff")
+class LUAMACHINEPROJECT_API UTDecelerateBuff : public UTurretBuff
+{
+	GENERATED_BODY()
+
+public:
+	UTDecelerateBuff(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Turret Buff|Decelerate Buff")
+		float Duration;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Turret Buff|Decelerate Buff")
+		float SpeedOffsetLoss;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Turret Buff|Decelerate Buff")
+		float SpeedMulLoss;
+
+public:
+	virtual bool CanApplyToTurret(ATurret* Turret) const override { return true; }
+
+private:
+	UFUNCTION(BlueprintCallable, Category = "Turret Buff|Apply")
+		void ThisRetrofitBullet(ABullet* Bullet);
 
 };

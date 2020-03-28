@@ -2,13 +2,15 @@
 
 #include "Turret.h"
 #include "Engine/World.h"
+#include "UObject/ConstructorHelpers.h"
+
 #include "GameCore/Enemy.h"
 #include "Core/Bullet.h"
 #include "Core/TurretBuff.h"
 #include "Core/AttackBehavior.h"
 
 
-ATurret::ATurret(const FObjectInitializer& ObjectInitializer) : ALunePawnBase(ObjectInitializer), DamageOffset(0), DamageAddon(0), DamageMul(1.f), RangeMul(1.f), Damage(20), Range(50), BulletPrototype(ABullet::StaticClass()), AgilityOffset(0), AgilityMul(1.f), Agility(200), AttackPointPercentage(0.3f), AttackFired(false)
+ATurret::ATurret(const FObjectInitializer& ObjectInitializer) : ALunePawnBase(ObjectInitializer), DamageOffset(0), DamageAddon(0), DamageMul(1.f), RangeMul(1.f), Damage(20), Range(50), AgilityOffset(0), AgilityMul(1.f), Agility(200), AttackPointPercentage(0.3f), AttackFired(false)
 {
 	AttackRange = CreateDefaultSubobject<USphereComponent>(TEXT("AttackRange"));
 	RootComponent = AttackRange;
@@ -18,14 +20,16 @@ ATurret::ATurret(const FObjectInitializer& ObjectInitializer) : ALunePawnBase(Ob
 	AttackRange->OnComponentEndOverlap.AddDynamic(this, &ATurret::OnAttackRangeEndOverlap);
 	AttackRange->SetGenerateOverlapEvents(true);
 	bGenerateOverlapEventsDuringLevelStreaming = 1;
+	static ConstructorHelpers::FClassFinder<ABullet> BulletVisual(TEXT("Blueprint'/Game/CoreObjects/BulletVis.BulletVis_C'"));
+	BulletPrototype = BulletVisual.Class;
 }
 
 void ATurret::BeginPlay()
 {
 	Super::BeginPlay();
-	SetupRange();
 	RecalculateRange();
 	RecalculateAgility();
+	SetupRange();
 }
 
 void ATurret::Tick(float DeltaTime) {
@@ -77,7 +81,7 @@ void ATurret::OnAttackRangeEndOverlap(UPrimitiveComponent* OverlappedComp, AActo
 	}
 }
 
-void ATurret::OnWatchedEnemyKilled(AEnemy* Enemy, ATurret* TurretInstigator) {
+void ATurret::OnWatchedEnemyKilled(AEnemy* Enemy, ATurret* TurretInstigator, const EEnemyDieReason Reason) {
 	WatchList.Remove(Enemy);
 	if (AimingTarget == Enemy) {
 		AimingTarget = nullptr;
@@ -100,10 +104,15 @@ bool ATurret::CanAttackEnemy(AEnemy* Enemy) const {
 }
 
 ABullet* ATurret::GenerateBullet(AEnemy* Target) {
+	ensureAlwaysMsgf(BulletPrototype, TEXT("BulletPrototype != 0"));
 	FActorSpawnParameters Params;
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	Params.Instigator = this;
 	auto Bullet = GetWorld()->SpawnActor<ABullet>(BulletPrototype, GetActorLocation(), GetActorRotation(), Params);
+	if (!Bullet) {
+		UE_LOG(LuneProject, Error, TEXT("Generate Bullet == 0"));
+		return nullptr;
+	}
 	Bullet->SetTurretOwner(this);
 	Bullet->SetTarget(Target);
 	Bullet->Speed = BulletSpeed;

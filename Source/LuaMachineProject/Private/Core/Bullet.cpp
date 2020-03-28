@@ -21,18 +21,16 @@ void ABullet::BeginPlay() {
 
 void ABullet::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
-	if (Target) {
-		if (bPrimiereTargetAlive) {
-			MoveToTarget(DeltaTime);
-			if (FVector::Dist(GetActorLocation(), Target->GetActorLocation()) <= HitEnemyDistance) {
-				OnHitEnemy(Target);
-			}
+	if (Target && bPrimiereTargetAlive) {
+		MoveToTarget(DeltaTime);
+		if (FVector::Dist(GetActorLocation(), Target->GetActorLocation()) <= HitEnemyDistance) {
+			OnHitEnemy(Target);
 		}
-		else {
-			MoveAfterEnemyDied(DeltaTime);
-			if (FVector::Dist(GetActorLocation(), EnemyDieLocation) <= HitEnemyDistance) {
-				OnHitLocation(EnemyDieLocation);
-			}
+	}
+	else {
+		MoveAfterEnemyDied(DeltaTime);
+		if (FVector::Dist(GetActorLocation(), EnemyDieLocation) <= HitEnemyDistance) {
+			OnHitLocation(EnemyDieLocation);
 		}
 	}
 }
@@ -68,7 +66,7 @@ void ABullet::SetTarget(AEnemy* Enemy) {
 	bPrimiereTargetAlive = true;
 }
 
-void ABullet::ProcessTargetDieEvent(AEnemy* Enemy, ATurret* Turret) {
+void ABullet::ProcessTargetDieEvent(AEnemy* Enemy, ATurret* Turret, const EEnemyDieReason Reason) {
 	Target = nullptr;
 	EnemyDieLocation = Enemy->GetActorLocation();
 	bPrimiereTargetAlive = false;

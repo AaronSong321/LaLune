@@ -28,8 +28,6 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Development Test")
-	void TestCollide();
-	UFUNCTION(BlueprintCallable, Category = "Development Test")
 		void TestCollide2();
 
 	UPROPERTY(EditAnywhere, Category = "Development Test")

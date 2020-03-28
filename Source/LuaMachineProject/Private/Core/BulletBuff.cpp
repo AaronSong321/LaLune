@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "BulletBuff.h"
+#include "Core/CommonActors.h"
 
 
 // Sets default values for this component's properties
@@ -18,7 +19,9 @@ UBulletBuff::UBulletBuff()
 void UBulletBuff::BeginPlay()
 {
 	Super::BeginPlay();
-
+	if (!IsRegistered())
+		RegisterComponent();
+	UE_LOG(LuneProject, Log, TEXT("%s %d"), __FUNCTIONW__, __LINE__);
 	// ...
 	
 }

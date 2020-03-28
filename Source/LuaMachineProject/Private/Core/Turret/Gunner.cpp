@@ -2,8 +2,6 @@
 
 #include "Core/Turret/Gunner.h"
 
-#include "UObject/ConstructorHelpers.h"
-
 #include "Core/TurretBuffs/TDamageBuff.h"
 #include "Core/Bullet.h"
 
@@ -17,9 +15,6 @@ AGunner::AGunner(const FObjectInitializer& ObjectInitializer) :ATurret(ObjectIni
 	DamageBuff->Damage = 30;
 	DamageBuff->BuffOwner = this;
 	AddBuff(DamageBuff);
-
-	static ConstructorHelpers::FClassFinder<ABullet> BulletVisual(TEXT("Blueprint'/Game/CoreObjects/BulletVis.BulletVis_C'"));
-	BulletPrototype = BulletVisual.Class;
 }
 
 

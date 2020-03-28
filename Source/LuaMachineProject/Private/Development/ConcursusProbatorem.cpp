@@ -6,7 +6,7 @@
 #include "GameCore/Enemy.h"
 #include "Core/Turret.h"
 #include "Core/Turret/Gunner.h"
-
+#include "Core/Turret/HeavyFalcon.h"
 
 AConcursusProbatorem::AConcursusProbatorem()
 {
@@ -18,40 +18,21 @@ void AConcursusProbatorem::BeginPlay() {
 	TestCollide2();
 }
 
-void AConcursusProbatorem::TestCollide() {
-	turret1 = GetWorld()->SpawnActor<ATurret>(FVector::ZeroVector, FRotator::ZeroRotator);
-	FTimerHandle spawnTwoEnemiesHandle;
-	FTimerManager& timerSeter = GetWorld()->GetTimerManager();
-	timerSeter.SetTimer(spawnTwoEnemiesHandle, [this, &timerSeter, &spawnTwoEnemiesHandle]()->void {
-		TSubclassOf<AEnemy> WraithClass = LoadClass<AEnemy>(nullptr, TEXT("Blueprint'/Game/CoreObjects/Wraith.Wraith_C'"));
-		enemy1 = GetWorld()->SpawnActor<AEnemy>(WraithClass, FVector(100, 0, 100), FRotator::ZeroRotator);
-		enemy2 = GetWorld()->SpawnActor<AEnemy>(WraithClass, FVector(20, 0, 20), FRotator::ZeroRotator);
-		UE_LOG(LuneProject, Log, TEXT("%s"), *enemy1->GetActorLocation().ToString());
-		GetWorld()->GetTimerManager().ClearTimer(spawnTwoEnemiesHandle);
-	}, 1, false, 0.3f);
-	FTimerHandle changeTurretChangeHandle;
-	timerSeter.SetTimer(changeTurretChangeHandle, [this, &timerSeter, &changeTurretChangeHandle]()->void {
-		turret1->AddRangeMul(1.f);
-		GetWorld()->GetTimerManager().ClearTimer(changeTurretChangeHandle);
-	}, 1, false, 0.5f);
-}
-
 void AConcursusProbatorem::TestCollide2() {
 	FActorSpawnParameters Params;
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	turret1 = GetWorld()->SpawnActor<ATurret>(AGunner::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator, Params);
 	TSubclassOf<AEnemy> WraithClass = LoadClass<AEnemy>(this, TEXT("Blueprint'/Game/CoreObjects/Wraith.Wraith_C'"));
-	enemy1 = GetWorld()->SpawnActor<AEnemy>(WraithClass, FVector(100, 100, 0), FRotator::ZeroRotator, Params);
-	enemy2 = GetWorld()->SpawnActor<AEnemy>(WraithClass, FVector(300, -560, 0), FRotator::ZeroRotator, Params);
+	enemy1 = GetWorld()->SpawnActor<AEnemy>(WraithClass, FVector(500, 500, 0), FRotator::ZeroRotator, Params);
+	enemy2 = GetWorld()->SpawnActor<AEnemy>(WraithClass, FVector(-300, 600, 0), FRotator::ZeroRotator, Params);
 	enemy1->StartRoaming(FVector(1, 1, 0));
-	enemy1->RoamSpeed = 300;
-	turret1->AddRangeMul(3.f);
-
-	FTimerHandle PrintEnemiesLocation;
-	FTimerManager& TimerSeter = GetWorld()->GetTimerManager();
-	TimerSeter.SetTimer(PrintEnemiesLocation, [this]() {
-		//UE_LOG(LuneProject, Log, TEXT("Enemy1:(%s), Enemy2:(%s)"), *enemy1->GetActorLocation().ToString(), *enemy2->GetActorLocation().ToString()); 
-	}, 0.5f, true, 0.05f);
+	enemy1->SetSpeed(600);
+	enemy1->RoamTable = 100;
+	enemy2->StartRoaming(FVector(0, -1, 0));
+	enemy2->SetSpeed(600);
+	auto turret2 = GetWorld()->SpawnActor<ATurret>(AHeavyFalcon::StaticClass(), FVector(0, 400, 0), FRotator::ZeroRotator, Params);
+	turret2->AddRangeMul(3);
+	turret1->AddRangeMul(3);
 }
 
 void AConcursusProbatorem::EndPlay(const EEndPlayReason::Type EndPlayReason)

@@ -4,11 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Core/LunePawnBase.h"
+#include "Core/CommonActors.h"
 #include "Bullet.generated.h"
 
 class AEnemy;
 class UBulletBuff;
 class ATurret;
+
 
 /**
  * 
@@ -65,7 +67,7 @@ public:
 	ATurret* GetTurretOwner()const { return TurretOwner; }
 
 	UFUNCTION(BlueprintCallable, Category = "Bullet Target")
-	virtual void ProcessTargetDieEvent(AEnemy* Enemy, ATurret* Turret);
+	virtual void ProcessTargetDieEvent(AEnemy* Enemy, ATurret* Turret, const EEnemyDieReason Reason);
 	UFUNCTION(BlueprintCallable, Category = "Bullet Buff")
 	void AddBuff(UBulletBuff* Buff) {
 		ActiveBuffs.Add(Buff);

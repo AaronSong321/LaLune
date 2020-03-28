@@ -146,7 +146,7 @@ protected:
 		TArray<AEnemy*> WatchList;
 	// This function is protected only to be override in blueprint and should not be called externally.
 	UFUNCTION(Category = "Enemy Detection")
-		virtual void OnWatchedEnemyKilled(AEnemy* Enemy, ATurret* TurretInstigator);
+		virtual void OnWatchedEnemyKilled(AEnemy* Enemy, ATurret* TurretInstigator, const EEnemyDieReason Reason);
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy Detection")
 		AEnemy* AimingTarget;

@@ -8,10 +8,10 @@
 #include "Core/CommonActors.h"
 #include "Enemy.generated.h"
 
-
 class ATurret;
 class AActor;
 class USphereComponent;
+class UEnemyBuff;
 
 
 /**
@@ -39,10 +39,11 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Enemy Damaged")
 		FEnemyDamagedSignature OnEnemyDamaged;
 
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FEnemyKilledSignature, AEnemy*, Enemy, ATurret*, TurretInstigator);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FEnemyKilledSignature, AEnemy*, Enemy, ATurret*, TurretInstigator, const EEnemyDieReason, Reason);
 	// Event enemy killed
-	UPROPERTY(BlueprintAssignable, Category = "Enemy Killed")
+	UPROPERTY(BlueprintAssignable, Category = "Life Cycle")
 	FEnemyKilledSignature OnEnemyKilled;
+	virtual void Die(const EEnemyDieReason Reason, ATurret* TurretInstigator);
 
 	virtual void HitBy(class ABullet* Bullet);
 	UFUNCTION(BlueprintCallable, Category = "Enemy Damaged")
@@ -61,8 +62,6 @@ public:
 	int32 RoamTable = 40;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Roam")
 	FVector RoamDirection;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Roam")
-	float RoamSpeed = 1000;
 	UFUNCTION(BlueprintCallable, Category = "Roam")
 	void StartRoaming(FVector Direction = FVector::ForwardVector) {
 		RoamDirection = Direction.GetSafeNormal();
@@ -71,9 +70,39 @@ public:
 	}
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Roam")
 	EGroundAirValue GroundAirState = EGroundAirValue::Ground;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	float MaxHealth = 300;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	float HealthPoint;
 
+protected:
+	UPROPERTY(EditAnywhere, Category = "Speed")
+		float Speed = 300;
+	UPROPERTY(EditAnywhere, Category = "Speed")
+		float SpeedOffset = 0;
+	UPROPERTY(EditAnywhere, Category = "Speed")
+		float SpeedMul = 1.f;
+	UPROPERTY(EditAnywhere, Category = "Speed")
+		float SpeedActual;
+public:
+	UFUNCTION(BlueprintCallable, Category = "Speed") void SetSpeed(float NewSpeed) { Speed = NewSpeed; CalcSpeed(); }
+	UFUNCTION(BlueprintCallable, Category = "Speed")
+		void AddSpeedMul(float Mul) { SpeedMul += Mul; CalcSpeed(); }
+	UFUNCTION(BlueprintCallable, Category = "Speed")
+		void CalcSpeed() { SpeedActual = (Speed + SpeedOffset)*SpeedMul; }
+	UFUNCTION(BlueprintCallable, Category = "Speed")
+		void AddSpeedOffset(float Offset) { SpeedOffset += Offset; }
+
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy Buff")
+		TArray<UEnemyBuff*> ActiveBuffs;
+public:
+	// Add the EnemyBuff to the Enemy, the "on" method of this EnemyBuff is going to execute until next Tick.
+	// Returns true if this buff is successfully added, false if an incompatible buff already exists on this enemy.
+	UFUNCTION(BlueprintCallable, Category = "Enemy Buff")
+		bool AddBuff(UEnemyBuff* Buff);
+	UFUNCTION(BlueprintCallable, Category = "Enemy Buff")
+		void RemoveBuff(UEnemyBuff* Buff);
 };
