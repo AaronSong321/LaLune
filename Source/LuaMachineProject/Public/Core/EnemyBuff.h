@@ -18,7 +18,7 @@ class LUAMACHINEPROJECT_API UEnemyBuff : public UObject
 
 public:	
 	// Sets default values for this component's properties
-	UEnemyBuff(const FObjectInitializer& Initializer);
+	UEnemyBuff(const FObjectInitializer& Initializer = FObjectInitializer::Get());
 
 		
 public:
@@ -60,7 +60,9 @@ protected:
 	FEnemyBuffTickSignature EnemyBuffTickMethod;
 	DECLARE_DELEGATE_TwoParams(FEnemyBuffEndPlaySignature, AEnemy*, const EEnemyBuffEndReason);
 	FEnemyBuffEndPlaySignature EnemyBuffEndPlayMethod;
-
+	// Set this tag to true causes destroyed at Enemy::Tick
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Life Cycle")
+		bool bLifeCycleExpired = false;
 	
 public:
 	UFUNCTION(BlueprintCallable, Category = "Identifier") void SetUniqueBuffName(FString NewName) { UniqueBuffName = NewName; }
@@ -94,7 +96,7 @@ class LUAMACHINEPROJECT_API UEDecelerateBuff : public UEnemyBuff
 
 public:
 	// Sets default values for this component's properties
-	UEDecelerateBuff(const FObjectInitializer& Initializer);
+	UEDecelerateBuff(const FObjectInitializer& Initializer = FObjectInitializer::Get());
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Enemy Buff|Slow") float SpeedMulLoss;
@@ -102,5 +104,16 @@ public:
 
 public:
 	// Assume all deceleration buff with the same unique buff name has a same value of property SpeedMulLoss
+	virtual void OverrideBuff(UEnemyBuff* OtherBuff, EEnemyBuffCompatibility ConflictType) override;
+};
+
+UCLASS(Category = "Enemy Buff |Stun")
+class LUAMACHINEPROJECT_API UEStunBuff :public UEnemyBuff {
+	GENERATED_BODY()
+
+public:
+	UEStunBuff(const FObjectInitializer& Initializer = FObjectInitializer::Get());
+
+public:
 	virtual void OverrideBuff(UEnemyBuff* OtherBuff, EEnemyBuffCompatibility ConflictType) override;
 };

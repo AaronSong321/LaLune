@@ -81,5 +81,3 @@ void UTurretBuff::EndPlay(const EEndPlayReason::Type EndPlayReason) {
 	RemoveFromBuffMethod.Unbind();
 	OnTurretBuffDestroy.Clear();
 }
-
-

@@ -71,3 +71,8 @@ void ABullet::ProcessTargetDieEvent(AEnemy* Enemy, ATurret* Turret, const EEnemy
 	EnemyDieLocation = Enemy->GetActorLocation();
 	bPrimiereTargetAlive = false;
 }
+
+void ABullet::AddBuff(UBulletBuff* Buff) {
+	ActiveBuffs.Add(Buff);
+	Buff->SetBuffOwner(this);
+}

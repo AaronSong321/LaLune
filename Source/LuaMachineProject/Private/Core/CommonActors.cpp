@@ -25,3 +25,11 @@ FString UCommonActors::FormatInitCompleteVialationMessage(FString ClassName, FSt
 bool operator& (const EGroundAirValue left, const EGroundAirValue right) {
 	return ((uint8)left & (uint8)right) != 0;
 }
+
+EPerkName operator&(const EPerkName left, const EPerkName right) {
+	return (EPerkName)((int32)left & (int32)right);
+}
+
+EPerkName operator|(const EPerkName left, const EPerkName right) {
+	return (EPerkName)((int32)left | (int32)right);
+}

@@ -69,9 +69,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Bullet Target")
 	virtual void ProcessTargetDieEvent(AEnemy* Enemy, ATurret* Turret, const EEnemyDieReason Reason);
 	UFUNCTION(BlueprintCallable, Category = "Bullet Buff")
-	void AddBuff(UBulletBuff* Buff) {
-		ActiveBuffs.Add(Buff);
-	}
+		void AddBuff(UBulletBuff* Buff);
 	UFUNCTION(BlueprintCallable, Category = "Bullet Buff")
 	void RemoveBuff(UBulletBuff* Buff) {
 		ActiveBuffs.Remove(Buff);

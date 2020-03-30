@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Core/Turret.h"
-#include "HeavyFalcon.generated.h"
+#include "Hunter.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class LUAMACHINEPROJECT_API AHeavyFalcon : public ATurret
+class LUAMACHINEPROJECT_API AHunter : public ATurret
 {
 	GENERATED_BODY()
-
+	
 public:
-	AHeavyFalcon(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	AHunter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	
 	
 };

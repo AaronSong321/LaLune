@@ -58,7 +58,17 @@ enum class EEnemyBuffCompatibility :uint8 {
 	OverrideOld
 };
 
-
+//UENUM()
+enum class EPerkName :int32 {
+	Dummy = 0,
+	Soilder = 1,
+	Bomber = 1 << 1,
+	Arsonist = 1 << 2,
+	Electron = 1 << 3,
+	Couch = 1 << 4
+};
+EPerkName operator&(const EPerkName left, const EPerkName right);
+EPerkName operator|(const EPerkName left, const EPerkName right);
 
 #define LOGFL() UE_LOG(LuneProject, Log, TEXT("[%s %d]"), __FUNCTIONW__, __LINE__)
 #define ERRORFL(Message) UE_LOG(LuneProject, Error, TEXT("[%s %d]: %s"), __FUNCTIONW__, __LINE__, Message)

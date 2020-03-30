@@ -77,13 +77,13 @@ public:
 	float HealthPoint;
 
 protected:
-	UPROPERTY(EditAnywhere, Category = "Speed")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
 		float Speed = 300;
-	UPROPERTY(EditAnywhere, Category = "Speed")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
 		float SpeedOffset = 0;
-	UPROPERTY(EditAnywhere, Category = "Speed")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
 		float SpeedMul = 1.f;
-	UPROPERTY(EditAnywhere, Category = "Speed")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
 		float SpeedActual;
 public:
 	UFUNCTION(BlueprintCallable, Category = "Speed") void SetSpeed(float NewSpeed) { Speed = NewSpeed; CalcSpeed(); }
@@ -94,6 +94,16 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Speed")
 		void AddSpeedOffset(float Offset) { SpeedOffset += Offset; }
 
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stun")
+		uint8 StunLock = 0;
+public:
+	UFUNCTION(BlueprintCallable, Category = "Stun")
+		bool IsStunned() { return StunLock != 0; }
+	UFUNCTION(BlueprintCallable, Category = "Stun")
+		void AddStunLock() { ++StunLock; }
+	UFUNCTION(BlueprintCallable, Category = "Stun")
+		void RemoveStunLock() { --StunLock; }
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy Buff")

@@ -31,34 +31,41 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-#if WITH_EDITOR
-	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override {
-		FName PropertyName = (PropertyChangedEvent.Property != nullptr) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
-		if (PropertyName == GET_MEMBER_NAME_CHECKED(ATurret, Damage) || PropertyName == GET_MEMBER_NAME_CHECKED(ATurret, DamageMul) || PropertyName == GET_MEMBER_NAME_CHECKED(ATurret, DamageMul) || PropertyName == GET_MEMBER_NAME_CHECKED(ATurret, DamageAddon)) {
-			RecalculateDamage();
-		}
-		if (PropertyName == GET_MEMBER_NAME_CHECKED(ATurret, Agility) || PropertyName == GET_MEMBER_NAME_CHECKED(ATurret, AgilityOffset) || PropertyName == GET_MEMBER_NAME_CHECKED(ATurret, AgilityMul)) {
-			RecalculateAgility();
-		}
-	}
-#endif
 
 private:
 	UPROPERTY() int32 Price;
 	UPROPERTY() int32 MoneyCost;
-
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Damage) float Damage;
-	UPROPERTY(EditAnywhere, Transient, Category = Damage) float DamageOffset;
-	UPROPERTY(EditAnywhere, Transient, Category = Damage) float DamageMul;
-	UPROPERTY(EditAnywhere, Transient, Category = Damage) float DamageAddon;
-	UPROPERTY(VisibleAnywhere, Transient, Category = Damage) float DamageActual;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Range") float Range;
 	UPROPERTY(EditAnywhere, Transient, Category = "Attack Range") float RangeMul;
 	UPROPERTY(VisibleAnywhere, Transient, Category = "Attack Range") float RangeActual;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bullet Attribute") float BulletSpeed;
+
+protected:
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Perk Category") 
+		EPerkName PerkCategory;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Perk Category") 
+		EPerkName PerkCategoryAddon;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Perk Category")
+		EPerkName PerkCategoryActual;
+public:
+	//UFUNCTION(BlueprintCallable, Category = "Perk Category") 
+	FORCEINLINE void AddPerkCategory(EPerkName NewCategory) {
+		PerkCategoryAddon = PerkCategoryAddon | NewCategory;
+	}
+	//UFUNCTION(BlueprintCallable, Category = "Perk Category") 
+	FORCEINLINE void RemovePerkCategory(EPerkName DroppedCategory) {
+		PerkCategoryAddon = PerkCategoryAddon & (EPerkName)(!(int32)DroppedCategory);
+	}
+	FORCEINLINE void CalcPerkCategory() {
+		PerkCategoryActual = PerkCategory | PerkCategoryAddon;
+	}
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Turret Level") uint8 Level;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Turret Level") uint8 MaxLevel;
+
 
 public:
 	static FName GetStaticUniqueName() { return FName(TEXT("ATurret(ALuneActorBase(AActor))")); }
@@ -86,38 +93,6 @@ public:
 		MoneyCost = _money;
 	}
 	UFUNCTION(BlueprintCallable) int32 GetMoneyCost() const { return MoneyCost; }
-
-
-	UFUNCTION(BlueprintCallable) int32 GetDamage() const { return Damage; }
-	UFUNCTION(BlueprintCallable) void SetDamage(float _damage) {
-		if (_damage < 0) {
-			UE_LOG(LuneProject, Error, TEXT("Turret::Damage cannot be < 0 (the value you set is %f)."), _damage);
-			return;
-		}
-		Damage = _damage;
-		RecalculateDamage();
-	}
-	UFUNCTION(BlueprintCallable) float GetDamageActual() {
-		return DamageActual;
-	}
-	UFUNCTION(BlueprintCallable) void RecalculateDamage() {
-		DamageActual = (Damage + DamageOffset)*DamageMul + DamageAddon;
-	}
-	UFUNCTION(BlueprintCallable) void AddDamageOffset(float offset) {
-		DamageOffset += offset;
-		RecalculateDamage();
-	}
-	UFUNCTION(BlueprintCallable) void AddDamageMul(float mul) {
-		DamageMul += mul;
-		RecalculateDamage();
-	}
-	UFUNCTION(BlueprintCallable) float GetDamageOffset() const { return DamageOffset; }
-	UFUNCTION(BlueprintCallable) float GetDamageMul() const { return DamageMul; }
-	UFUNCTION(BlueprintCallable) void ResetDamage() {
-		DamageOffset = 0;
-		DamageMul = 1;
-		DamageActual = Damage;
-	}
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class USphereComponent* AttackRange;
@@ -166,12 +141,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Buff")
 		TArray<UTurretBuff*> ActiveBuffs;
 	UFUNCTION(BlueprintCallable, Category = "Buff")
-	void AddBuff(UTurretBuff* buff) {
-		ActiveBuffs.Add(buff);
-	}
+		void AddBuff(UTurretBuff* Buff);
 	UFUNCTION(BlueprintCallable, Category = "Buff")
-	void RemoveBuff(UTurretBuff* buff) {
-		ActiveBuffs.Remove(buff);
+	void RemoveBuff(UTurretBuff* Buff) {
+		ActiveBuffs.Remove(Buff);
 	}
 
 public:

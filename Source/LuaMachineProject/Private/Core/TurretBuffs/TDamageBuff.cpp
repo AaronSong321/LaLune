@@ -8,20 +8,22 @@
 #include "Core/Turret.h"
 #include "Core/EnemyBuff.h"
 
-UTDamageBuff::UTDamageBuff(const FObjectInitializer& ObjectInitializer) {
+UTDamageBuff::UTDamageBuff(const FObjectInitializer& ObjectInitializer) :UTurretBuff(ObjectInitializer) {
 	bUseCount = 0;
 	bHasLimitedTime = 0;
-	bHasDamage = 1;
 	bGenerateBulletBuff = 1;
 	bAffectOtherTurretBuffs = 0;
 	PrimaryComponentTick.bCanEverTick = false;
 	RetrofitBulletMethod.BindUObject(this, &UTDamageBuff::ThisRetrofitBullet);
+
+	DamageOffset = 0;
+	DamageMul = 1;
+	DamageAddon = 0;
 }
 
 void UTDamageBuff::ThisRetrofitBullet(ABullet* Bullet) {
 	UBulletBuff* BBuff = NewObject<UBulletBuff>(BulletBuffPrototype);
-	BBuff->SetUseDamage(bHasDamage);
-	BBuff->SetBuffOwner(Bullet);
+	BBuff->SetUseDamage(true);
 	BBuff->SetDamage(Damage);
 	BBuff->OnBulletHitEnemy.BindLambda([](UBulletBuff* Buff, AEnemy* Enemy) {
 		Enemy->TakeBulletDamage(Buff->GetDamage(), Buff->GetBuffOwner()->GetTurretOwner(), Buff->GetBuffOwner());
@@ -29,10 +31,9 @@ void UTDamageBuff::ThisRetrofitBullet(ABullet* Bullet) {
 	Bullet->AddBuff(BBuff);
 }
 
-UTDecelerateBuff::UTDecelerateBuff(const FObjectInitializer& ObjectInitializer) {
+UTDecelerateBuff::UTDecelerateBuff(const FObjectInitializer& ObjectInitializer) :UTurretBuff(ObjectInitializer) {
 	bUseCount = 0;
 	bHasLimitedTime = 0;
-	bHasDamage = 0;
 	bGenerateBulletBuff = 1;
 	bAffectOtherTurretBuffs = 0;
 	PrimaryComponentTick.bCanEverTick = false;
@@ -40,16 +41,37 @@ UTDecelerateBuff::UTDecelerateBuff(const FObjectInitializer& ObjectInitializer) 
 }
 
 void UTDecelerateBuff::ThisRetrofitBullet(ABullet* Bullet) {
-	UBulletBuff* DBuff = NewObject<UBulletBuff>(BulletBuffPrototype);
-	DBuff->SetUseDamage(bHasDamage);
-	DBuff->SetBuffOwner(Bullet);
-	DBuff->OnBulletHitEnemy.BindLambda([this](UBulletBuff* Buff, AEnemy* Enemy) {
+	UBulletBuff* BBuff = NewObject<UBulletBuff>(BulletBuffPrototype);
+	BBuff->SetUseDamage(false);
+	BBuff->OnBulletHitEnemy.BindLambda([this](UBulletBuff* Buff, AEnemy* Enemy) {
 		UEDecelerateBuff* EBuff = NewObject<UEDecelerateBuff>(UEDecelerateBuff::StaticClass());
 		EBuff->SetDuration(Duration);
 		EBuff->SpeedMulLoss = SpeedMulLoss;
 		EBuff->SpeedOffsetLoss = SpeedOffsetLoss;
 		Enemy->AddBuff(EBuff);
 	});
-	Bullet->AddBuff(DBuff);
+	Bullet->AddBuff(BBuff);
 }
 
+
+UTStunBuff::UTStunBuff(const FObjectInitializer& ObjectInitializer) :UTurretBuff(ObjectInitializer) {
+	bUseCount = 0;
+	bHasLimitedTime = 0;
+	bGenerateBulletBuff = 1;
+	bAffectOtherTurretBuffs = 0;
+	PrimaryComponentTick.bCanEverTick = false;
+	RetrofitBulletMethod.BindUObject(this, &UTStunBuff::ThisRetrofitBullet);
+}
+
+void UTStunBuff::ThisRetrofitBullet(ABullet* Bullet) {
+	bool TriggerAbility = FMath::RandRange(0, 1) < Possibility;
+	if (TriggerAbility) {
+		UBulletBuff* BBuff = NewObject<UBulletBuff>(BulletBuffPrototype);
+		BBuff->OnBulletHitEnemy.BindLambda([this](UBulletBuff* Buff, AEnemy* Enemy) {
+			UEStunBuff* EBuff = NewObject<UEStunBuff>(UEStunBuff::StaticClass());
+			EBuff->SetDuration(Duration);
+			Enemy->AddBuff(EBuff);
+		});
+		Bullet->AddBuff(BBuff);
+	}
+}

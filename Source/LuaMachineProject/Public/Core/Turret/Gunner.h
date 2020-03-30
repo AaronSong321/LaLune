@@ -15,7 +15,7 @@ class LUAMACHINEPROJECT_API AGunner : public ATurret
 	GENERATED_BODY()
 	
 public:
-	AGunner(const FObjectInitializer& ObjectInitializer);
+	AGunner(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	
 	
 };

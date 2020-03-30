@@ -12,8 +12,9 @@ AGunner::AGunner(const FObjectInitializer& ObjectInitializer) :ATurret(ObjectIni
 	BulletSpeed = 200;
 
 	UTDamageBuff* DamageBuff = UObject::CreateDefaultSubobject<UTDamageBuff>(TEXT("PrimaryBuff"));
-	DamageBuff->Damage = 30;
-	DamageBuff->BuffOwner = this;
+	DamageBuff->SetDamage(30);
+	DamageBuff->bTurretDefault = true;
+	DamageBuff->bDisplayInBuffList = false;
 	AddBuff(DamageBuff);
 }
 

@@ -10,7 +10,7 @@
 #include "Core/AttackBehavior.h"
 
 
-ATurret::ATurret(const FObjectInitializer& ObjectInitializer) : ALunePawnBase(ObjectInitializer), DamageOffset(0), DamageAddon(0), DamageMul(1.f), RangeMul(1.f), Damage(20), Range(50), AgilityOffset(0), AgilityMul(1.f), Agility(200), AttackPointPercentage(0.3f), AttackFired(false)
+ATurret::ATurret(const FObjectInitializer& ObjectInitializer) : ALunePawnBase(ObjectInitializer), RangeMul(1.f), Range(50), AgilityOffset(0), AgilityMul(1.f), Agility(200), AttackPointPercentage(0.3f), AttackFired(false)
 {
 	AttackRange = CreateDefaultSubobject<USphereComponent>(TEXT("AttackRange"));
 	RootComponent = AttackRange;
@@ -97,6 +97,14 @@ void ATurret::RefreshTarget() {
 		AimingTarget = nullptr;
 	AttackPhase = 0.f;
 	AttackFired = false;
+}
+
+void ATurret::AddBuff(UTurretBuff* Buff) {
+	if (Buff->CanApplyToTurret(this)) {
+		ActiveBuffs.Add(Buff);
+		Buff->BuffOwner = this;
+
+	}
 }
 
 bool ATurret::CanAttackEnemy(AEnemy* Enemy) const {

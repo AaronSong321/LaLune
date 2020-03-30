@@ -24,18 +24,28 @@ void AEnemy::BeginPlay() {
 
 void AEnemy::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
-	if (bRoaming) {
-		const FVector Direction = RoamPhase < RoamTable / 2 ? RoamDirection : -RoamDirection;
-		if (++RoamPhase == RoamTable) {
-			RoamPhase = 0;
-		}
-		SetActorLocation(GetActorLocation() + Direction*DeltaTime*SpeedActual);
-		if (RoamPhase == 0 || RoamPhase == RoamTable / 2) {
-			//UE_LOG(LuneProject, Log, TEXT("Enemy roamed to (%s)"), *GetActorLocation().ToString());
+	if (!IsStunned()) {
+		if (bRoaming) {
+			const FVector Direction = RoamPhase < RoamTable / 2 ? RoamDirection : -RoamDirection;
+			if (++RoamPhase == RoamTable) {
+				RoamPhase = 0;
+			}
+			SetActorLocation(GetActorLocation() + Direction*DeltaTime*SpeedActual);
+			if (RoamPhase == 0 || RoamPhase == RoamTable / 2) {
+				//UE_LOG(LuneProject, Log, TEXT("Enemy roamed to (%s)"), *GetActorLocation().ToString());
+			}
 		}
 	}
+
+	TArray<UEnemyBuff*> RemoveList;
 	for (UEnemyBuff* Buff : ActiveBuffs) {
 		Buff->OnBuffTick(Buff->EnemyTarget, DeltaTime);
+		if (Buff->bLifeCycleExpired) {
+			RemoveList.Add(Buff);
+		}
+	}
+	for (UEnemyBuff* Buff : RemoveList) {
+		ActiveBuffs.Remove(Buff);
 	}
 }
 

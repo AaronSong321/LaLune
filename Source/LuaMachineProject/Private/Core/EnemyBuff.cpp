@@ -38,7 +38,7 @@ void UEnemyBuff::OnBuffTick(AEnemy* Enemy, float DeltaTime)
 		UE_LOG(LuneProject, Warning, TEXT("This EnemyBuff has no Target during TickComponent"));
 	if (TimeLeft == 0.f) {
 		OnBuffEndPlay(Enemy, EEnemyBuffEndReason::TimesUp);
-		Enemy->RemoveBuff(this);
+		bLifeCycleExpired = true;
 	}
 }
 
@@ -65,16 +65,8 @@ UEDecelerateBuff::UEDecelerateBuff(const FObjectInitializer& Initializer) :UEnem
 		Enemy->AddSpeedMul(-SpeedMulLoss);
 	});
 	EnemyBuffEndPlayMethod.BindLambda([this](AEnemy* Enemy, const EEnemyBuffEndReason Reason) {
-		switch (Reason) {
-		case EEnemyBuffEndReason::EnemyDie:
-			// nothong to do
-			break;
-		case EEnemyBuffEndReason::TimesUp:
-		case EEnemyBuffEndReason::Discard:
-			Enemy->AddSpeedOffset(SpeedOffsetLoss);
-			Enemy->AddSpeedMul(SpeedMulLoss);
-			break;
-		}
+		Enemy->AddSpeedOffset(SpeedOffsetLoss);
+		Enemy->AddSpeedMul(SpeedMulLoss);
 	});
 }
 
@@ -82,6 +74,25 @@ UEDecelerateBuff::UEDecelerateBuff(const FObjectInitializer& Initializer) :UEnem
 void UEDecelerateBuff::OverrideBuff(UEnemyBuff* OtherBuff, const EEnemyBuffCompatibility ConflictType) {
 	if (ConflictType == EEnemyBuffCompatibility::OverrideOld) {
 		if (UEDecelerateBuff* OtherBuffOfThisClass = Cast<UEDecelerateBuff>(OtherBuff)) {
+			OtherBuff->Duration = FMath::Max(Duration, OtherBuff->Duration);
+			OtherBuff->TimeLeft = FMath::Max(Duration, OtherBuff->TimeLeft);
+		}
+	}
+}
+
+UEStunBuff::UEStunBuff(const FObjectInitializer& Initializer) {
+	UniqueBuffName = TEXT("Stun_GeneralClass");
+	EnemyBuffBeginPlayMethod.BindLambda([](AEnemy* Enemy) {
+		Enemy->AddStunLock();
+	});
+	EnemyBuffEndPlayMethod.BindLambda([](AEnemy* Enemy, const EEnemyBuffEndReason Reason) {
+		Enemy->RemoveStunLock();
+	});
+}
+
+void UEStunBuff::OverrideBuff(UEnemyBuff* OtherBuff, const EEnemyBuffCompatibility ConflictType) {
+	if (ConflictType == EEnemyBuffCompatibility::OverrideOld) {
+		if (UEStunBuff* OtherBuffOfThisClass = Cast<UEStunBuff>(OtherBuff)) {
 			OtherBuff->Duration = FMath::Max(Duration, OtherBuff->Duration);
 			OtherBuff->TimeLeft = FMath::Max(Duration, OtherBuff->TimeLeft);
 		}
