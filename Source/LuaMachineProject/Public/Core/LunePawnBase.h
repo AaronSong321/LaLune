@@ -30,11 +30,6 @@ public:
 private:
 	uint8 bIntializationCompleted : 1;
 
-public:
-	UFUNCTION(BlueprintCallable)
-		static FName GetStaticUniqueName() { return FName(TEXT("ALunePawnBase(APawn)")); }
-	UFUNCTION(BlueprintCallable)
-		virtual FName GetUniqueName() const { return FName(TEXT("ALunePawnBase(APawn)")); }
 protected:
 	UFUNCTION(BlueprintCallable)
 		uint8 IsInitializationCompleted() { return bIntializationCompleted; }

@@ -11,7 +11,8 @@
 			"AdditionalDependencies": [
 				"LuaMachine",
 				"CoreUObject",
-				"Engine"
+				"Engine",
+				"UMG"
 			]
 		}
 	]

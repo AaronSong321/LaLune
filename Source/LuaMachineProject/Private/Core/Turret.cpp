@@ -9,6 +9,7 @@
 #include "Core/TurretBuff.h"
 #include "Core/AttackBehavior.h"
 
+#define LOCTEXT_NAMESPACE "Turret"
 
 ATurret::ATurret(const FObjectInitializer& ObjectInitializer) : ALunePawnBase(ObjectInitializer), RangeMul(1.f), Range(50), AgilityOffset(0), AgilityMul(1.f), Agility(200), AttackPointPercentage(0.3f), AttackFired(false)
 {
@@ -20,9 +21,16 @@ ATurret::ATurret(const FObjectInitializer& ObjectInitializer) : ALunePawnBase(Ob
 	AttackRange->OnComponentEndOverlap.AddDynamic(this, &ATurret::OnAttackRangeEndOverlap);
 	AttackRange->SetGenerateOverlapEvents(true);
 	bGenerateOverlapEventsDuringLevelStreaming = 1;
-	static ConstructorHelpers::FClassFinder<ABullet> BulletVisual(TEXT("Blueprint'/Game/CoreObjects/BulletVis.BulletVis_C'"));
+	static ConstructorHelpers::FClassFinder<ABullet> BulletVisual(TEXT("Blueprint'/Game/CoreObjects/BulletBp.BulletBp_C'"));
 	BulletPrototype = BulletVisual.Class;
+
+	TurretName = LOCTEXT("TurretName_GeneralClass", "Turret");
+	DisplayTurretName_FT = LOCTEXT("DisplayTurretName_FT", "{0} - Lv {1}");
+	DisplayDamage = LOCTEXT("DisplayDamage", "Damage");
+	DisplayAgility = LOCTEXT("DisplayAgility", "Agility");
+	DisplayRange = LOCTEXT("DisplayRange", "Range");
 }
+
 
 void ATurret::BeginPlay()
 {
@@ -148,3 +156,10 @@ void ATurret::TickAttack(float DeltaTime) {
 		AttackFired = false;
 	}
 }
+
+FText ATurret::GetUITurretName() {
+	return FText::Format(DisplayTurretName_FT, TurretName, Level);
+}
+
+#undef LOCTEXT_NAMESPACE
+

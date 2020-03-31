@@ -65,12 +65,15 @@ public:
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Turret Level") uint8 Level;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Turret Level") uint8 MaxLevel;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI") FText TurretName;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI") FText DisplayTurretName_FT;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI") FText DisplayDamage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI") FText DisplayAgility;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI") FText DisplayRange;
+	UFUNCTION(BlueprintCallable, Category = "UI") virtual FText GetUITurretName();
+	UFUNCTION(BlueprintCallable, Category = "UI") virtual float GetUIDamage() { return 0; }
 
 public:
-	static FName GetStaticUniqueName() { return FName(TEXT("ATurret(ALuneActorBase(AActor))")); }
-	virtual FName GetUniqueName() const override { return FName(TEXT("ATurret(ALuneActorBase(AActor))")); }
-
 	UFUNCTION(BlueprintCallable)
 		void SetPrice(int32 _price)
 	{
